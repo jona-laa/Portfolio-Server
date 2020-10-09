@@ -89,7 +89,7 @@ class Job {
                     title = :title,
                     date_start = :date_start,
                     date_end = :date_end,
-                    descr = :descr,
+                    descr = :descr
                 WHERE
                     id = :id";
     
