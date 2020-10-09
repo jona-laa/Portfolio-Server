@@ -1,15 +1,14 @@
 <?php
-class Job {
+class Project {
     private $conn;
-    private $table_name = "jobs";
+    private $table_name = "projects";
   
     // Job Properties
     public $id;
-    public $company;
     public $title;
-    public $date_start;
-    public $date_end;
+    public $prj_url;
     public $descr;
+    public $img_src;
   
     public function __construct($db){
         $this->conn = $db;
@@ -19,7 +18,7 @@ class Job {
 
     // Get All Jobs
     function read(){
-        $query = "SELECT id, company, title, date_start, date_end, descr FROM $this->table_name";
+        $query = "SELECT id, title, prj_url, descr, img_src FROM $this->table_name";
         $result = $this->conn->prepare($query);
         $result->execute();
         return $result;
@@ -29,7 +28,7 @@ class Job {
 
     // Get One Job
     function readOne($id){
-        $query = "SELECT id, company, title, date_start, date_end, descr FROM $this->table_name WHERE id=$id";        
+        $query = "SELECT id, title, prj_url, descr, img_src FROM $this->table_name WHERE id=$id";        
         $result = $this->conn->prepare($query);
         $result->execute();
         return $result;
@@ -42,24 +41,22 @@ class Job {
        $query = "INSERT INTO 
        $this->table_name
             SET
-                company=:company, title=:title, date_start=:date_start, date_end=:date_end, descr=:descr";
+                title=:title, prj_url=:prj_url, descr=:descr, img_src=:img_src";
   
         // Prepare query statement
         $statement = $this->conn->prepare($query);
     
         // Sanitize data
-        $this->company=htmlspecialchars(strip_tags($this->company));
         $this->title=htmlspecialchars(strip_tags($this->title));
-        $this->date_start=htmlspecialchars(strip_tags($this->date_start));
-        $this->date_end=htmlspecialchars(strip_tags($this->date_end));
+        $this->prj_url=htmlspecialchars(strip_tags($this->prj_url));
         $this->descr=htmlspecialchars(strip_tags($this->descr));
+        $this->img_src=htmlspecialchars(strip_tags($this->img_src));
     
         // Bind values
-        $statement->bindParam(":company", $this->company);
         $statement->bindParam(":title", $this->title);
-        $statement->bindParam(":date_start", $this->date_start);
-        $statement->bindParam(":date_end", $this->date_end);
+        $statement->bindParam(":prj_url", $this->prj_url);
         $statement->bindParam(":descr", $this->descr);
+        $statement->bindParam(":img_src", $this->img_src);
     
         if($statement->execute()){
             return true;
@@ -85,11 +82,10 @@ class Job {
         $query = "UPDATE 
             $this->table_name
                 SET
-                    company = :company,
                     title = :title,
-                    date_start = :date_start,
-                    date_end = :date_end,
-                    descr = :descr
+                    prj_url = :prj_url,
+                    descr = :descr,
+                    img_src = :img_src
                 WHERE
                     id = :id";
     
@@ -97,19 +93,17 @@ class Job {
     
         // Sanitize data
         $this->id=htmlspecialchars(strip_tags($this->id));
-        $this->company=htmlspecialchars(strip_tags($this->company));
         $this->title=htmlspecialchars(strip_tags($this->title));
-        $this->date_start=htmlspecialchars(strip_tags($this->date_start));
-        $this->date_end=htmlspecialchars(strip_tags($this->date_end));
+        $this->prj_url=htmlspecialchars(strip_tags($this->prj_url));
         $this->descr=htmlspecialchars(strip_tags($this->descr));
+        $this->img_src=htmlspecialchars(strip_tags($this->img_src));
 
         // Bind Values
         $statement->bindParam(':id', $this->id);
-        $statement->bindParam(':company', $this->company);
         $statement->bindParam(':title', $this->title);
-        $statement->bindParam(':date_start', $this->date_start);
-        $statement->bindParam(':date_end', $this->date_end);
+        $statement->bindParam(':prj_url', $this->prj_url);
         $statement->bindParam(':descr', $this->descr);
+        $statement->bindParam(':img_src', $this->img_src);
     
         if($statement->execute()){
             return true;
