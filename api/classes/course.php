@@ -1,12 +1,12 @@
 <?php
-class Job {
+class Course {
     private $conn;
-    private $table_name = "jobs";
+    private $table_name = "courses";
   
-    // Job Properties
+    // Course Properties
     public $id;
-    public $company;
     public $title;
+    public $institution;
     public $date_start;
     public $date_end;
     public $descr;
@@ -17,9 +17,9 @@ class Job {
 
 
 
-    // Get All Jobs
+    // Get All Courses
     function read(){
-        $query = "SELECT id, company, title, date_start, date_end, descr FROM $this->table_name";
+        $query = "SELECT id, title, institution, date_start, date_end, descr FROM $this->table_name";
         $result = $this->conn->prepare($query);
         $result->execute();
         return $result;
@@ -27,9 +27,9 @@ class Job {
 
 
 
-    // Get One Job
+    // Get One Course
     function readOne($id){
-        $query = "SELECT id, company, title, date_start, date_end, descr FROM $this->table_name WHERE id=$id";        
+        $query = "SELECT id, title, institution, date_start, date_end, descr FROM $this->table_name WHERE id=$id";        
         $result = $this->conn->prepare($query);
         $result->execute();
         return $result;
@@ -37,26 +37,26 @@ class Job {
 
 
 
-    // Create New Job
+    // Create New Course
     function create() {
        $query = "INSERT INTO 
        $this->table_name
             SET
-                company=:company, title=:title, date_start=:date_start, date_end=:date_end, descr=:descr";
+                title=:title, institution=:institution, date_start=:date_start, date_end=:date_end, descr=:descr";
   
-        // Prepare query statement
+        // Prep that Query yo
         $statement = $this->conn->prepare($query);
     
-        // Sanitize data
-        $this->company=htmlspecialchars(strip_tags($this->company));
+        // Better Sanitize them Datas
         $this->title=htmlspecialchars(strip_tags($this->title));
+        $this->institution=htmlspecialchars(strip_tags($this->institution));
         $this->date_start=htmlspecialchars(strip_tags($this->date_start));
         $this->date_end=htmlspecialchars(strip_tags($this->date_end));
         $this->descr=htmlspecialchars(strip_tags($this->descr));
     
-        // Bind values
-        $statement->bindParam(":company", $this->company);
+        // Bind those values my dude
         $statement->bindParam(":title", $this->title);
+        $statement->bindParam(":institution", $this->institution);
         $statement->bindParam(":date_start", $this->date_start);
         $statement->bindParam(":date_end", $this->date_end);
         $statement->bindParam(":descr", $this->descr);
@@ -70,7 +70,7 @@ class Job {
 
 
 
-    // Delete Job
+    // Delete a Course
     function delete($id) {
         $query = "DELETE FROM $this->table_name WHERE id=$id";
         $result = $this->conn->prepare($query);
@@ -80,13 +80,13 @@ class Job {
 
 
     
-    // Update Job
+    // Update Course
     function update() {
         $query = "UPDATE 
             $this->table_name
                 SET
-                    company = :company,
                     title = :title,
+                    institution = :institution,
                     date_start = :date_start,
                     date_end = :date_end,
                     descr = :descr
@@ -95,21 +95,21 @@ class Job {
     
         $statement = $this->conn->prepare($query);
     
-        // Sanitize data
-        $this->id=htmlspecialchars(strip_tags($this->id));
-        $this->company=htmlspecialchars(strip_tags($this->company));
+        // Sanitize Them Stings, Son 
         $this->title=htmlspecialchars(strip_tags($this->title));
+        $this->institution=htmlspecialchars(strip_tags($this->institution));
         $this->date_start=htmlspecialchars(strip_tags($this->date_start));
         $this->date_end=htmlspecialchars(strip_tags($this->date_end));
         $this->descr=htmlspecialchars(strip_tags($this->descr));
+        $this->id=htmlspecialchars(strip_tags($this->id));
 
         // Bind Values
-        $statement->bindParam(':id', $this->id);
-        $statement->bindParam(':company', $this->company);
         $statement->bindParam(':title', $this->title);
+        $statement->bindParam(':institution', $this->institution);
         $statement->bindParam(':date_start', $this->date_start);
         $statement->bindParam(':date_end', $this->date_end);
         $statement->bindParam(':descr', $this->descr);
+        $statement->bindParam(':id', $this->id);
     
         if($statement->execute()){
             return true;
