@@ -143,6 +143,7 @@ switch($req_method) {
 
         // Deny req if empty input
         if(
+            !empty($data->id) &&
             !empty($data->title) &&
             !empty($data->prj_url) &&
             !empty($data->descr) &&

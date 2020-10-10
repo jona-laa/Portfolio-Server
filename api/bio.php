@@ -85,14 +85,15 @@ switch($req_method) {
         if(
             !empty($data->heading) &&
             !empty($data->bio) &&
-            !empty($data->img_src) &&
-            isset($data->published)
+            !empty($data->img_src)
             ){
             // set bio property values
             $bio->heading = $data->heading;
             $bio->bio = $data->bio;
             $bio->img_src = $data->img_src;
-            $bio->published = $data->published;
+            if(!empty($data->published)) {
+                $bio->published = $data->published;
+            }
     
             if($bio->create()) {
                 http_response_code(201);

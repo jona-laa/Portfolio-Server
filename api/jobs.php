@@ -146,6 +146,7 @@ switch($req_method) {
 
         // Deny req if empty input
         if(
+            !empty($data->id) &&
             !empty($data->company) &&
             !empty($data->title) &&
             !empty($data->date_start) &&
