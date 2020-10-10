@@ -141,26 +141,36 @@ switch($req_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
 
-        // set ID property of course to be edited
-        $course->id = $data->id;
-        
-        // set course property values
-        $course->title = $data->title;
-        $course->institution = $data->institution;
-        $course->date_start = $data->date_start;
-        $course->date_end = $data->date_end;
-        $course->descr = $data->descr;
+        // Deny req if empty input
+        if(
+            !empty($data->title) &&
+            !empty($data->institution) &&
+            !empty($data->date_start) &&
+            !empty($data->date_end) &&
+            !empty($data->descr) 
+        ){
+            // set course property values
+            $course->id = $data->id;
+            $course->title = $data->title;
+            $course->institution = $data->institution;
+            $course->date_start = $data->date_start;
+            $course->date_end = $data->date_end;
+            $course->descr = $data->descr;
 
-        if($course->update()) {
-            http_response_code(200);
-            echo json_encode(
-                array("code" => 200, "message" => "Course updated")
-            );
+            if($course->update()) {
+                http_response_code(200);
+                echo json_encode(
+                    array("code" => 200, "message" => "Course updated")
+                );
+            } else {
+                http_response_code(503);
+                echo json_encode(
+                    array("code" => 503, "message" => "Sever error. Try again.")
+                );           
+            }
         } else {
-            http_response_code(503);
-            echo json_encode(
-                array("code" => 503, "message" => "Sever error. Try again.")
-            );           
+            http_response_code(400);        
+            echo json_encode(array("code" => 400, "message" => "Unable to update course. Data is incomplete."));
         }
         break;
 }
