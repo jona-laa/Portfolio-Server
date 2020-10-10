@@ -15,7 +15,10 @@ $req_method = $_SERVER['REQUEST_METHOD'];
 if(isset($_GET['id'])) {
     $id = $_GET['id'];
 }
-
+// Get post to output on page
+if(isset($GET['published'])) {
+    $published = $_GET['published'];
+}
 
 
 // Instantiate DB and bio
@@ -33,8 +36,10 @@ switch($req_method) {
     // GET
     case 'GET':
         // Get all or One bio?
-        if(isset($id)) {
+        if (!empty($id)) {
             $result = $bio->readOne($id);
+        } elseif (!empty($_GET['published'])) {
+            $result = $bio->readPublished($_GET['published']);
         } else {
             $result = $bio->read();
         }

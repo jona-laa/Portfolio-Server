@@ -3,7 +3,7 @@ class Bio {
     private $conn;
     private $table_name = "bio";
   
-    // Course Properties
+    // Bio Properties
     public $id;
     public $heading;
     public $bio;
@@ -15,7 +15,7 @@ class Bio {
 
 
 
-    // Get All Courses
+    // Get All Bio
     function read(){
         $query = "SELECT id, heading, bio, img_src FROM $this->table_name";
         $result = $this->conn->prepare($query);
@@ -27,7 +27,18 @@ class Bio {
 
     // Get One Course
     function readOne($id){
+        var_dump($id);
         $query = "SELECT id, heading, bio, img_src FROM $this->table_name WHERE id=$id";        
+        $result = $this->conn->prepare($query);
+        $result->execute();
+        return $result;
+    }
+
+
+
+    // Get Post for Publishing (If there's more than one readOne is not realiable)
+    function readPublished($published){
+        $query = "SELECT id, heading, bio, img_src FROM $this->table_name WHERE published=$published";        
         $result = $this->conn->prepare($query);
         $result->execute();
         return $result;
