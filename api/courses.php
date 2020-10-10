@@ -71,7 +71,8 @@ switch($req_method) {
                 array("code" => 404, "message" => "No courses found.")
             );
         }
-        break;
+
+    break;
 
         
         
@@ -105,11 +106,12 @@ switch($req_method) {
                     array("code" => 503, "message" => "Something went wrong. Try again.")
                 );
             }
-        } else{
+        } else {
             http_response_code(400);        
             echo json_encode(array("code" => 400, "message" => "Unable to create course. Data is incomplete."));
         }
-        break;
+
+    break;
     
     
     
@@ -133,7 +135,8 @@ switch($req_method) {
                 );
             }
         }
-        break;
+
+    break;
     
 
 
@@ -172,5 +175,6 @@ switch($req_method) {
             http_response_code(400);        
             echo json_encode(array("code" => 400, "message" => "Unable to update course. Data is incomplete."));
         }
-        break;
+
+    break;
 }

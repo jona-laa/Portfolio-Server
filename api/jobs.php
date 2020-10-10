@@ -71,7 +71,8 @@ switch($req_method) {
                 array("code" => 404, "message" => "No jobs found.")
             );
         }
-        break;
+        
+    break;
 
         
         
@@ -105,11 +106,12 @@ switch($req_method) {
                     array("code" => 503, "message" => "Something went wrong. Try again.")
                 );
             }
-        } else{
+        } else {
             http_response_code(400);        
             echo json_encode(array("code" => 400, "message" => "Unable to create job. Data is incomplete."));
         }
-        break;
+        
+    break;
     
     
     
@@ -133,7 +135,8 @@ switch($req_method) {
                 );
             }
         }
-        break;
+        
+    break;
     
 
 
@@ -141,26 +144,37 @@ switch($req_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
 
-        // set ID property of job to be edited
-        $job->id = $data->id;
-        
-        // set job property values
-        $job->company = $data->company;
-        $job->title = $data->title;
-        $job->date_start = $data->date_start;
-        $job->date_end = $data->date_end;
-        $job->descr = $data->descr;
+        // Deny req if empty input
+        if(
+            !empty($data->company) &&
+            !empty($data->title) &&
+            !empty($data->date_start) &&
+            !empty($data->date_end) &&
+            !empty($data->descr) 
+        ){        
+            // set job property values
+            $job->id = $data->id;
+            $job->company = $data->company;
+            $job->title = $data->title;
+            $job->date_start = $data->date_start;
+            $job->date_end = $data->date_end;
+            $job->descr = $data->descr;
 
-        if($job->update()) {
-            http_response_code(200);
-            echo json_encode(
-                array("code" => 200, "message" => "job updated")
-            );
+            if($job->update()) {
+                http_response_code(200);
+                echo json_encode(
+                    array("code" => 200, "message" => "job updated")
+                );
+            } else {
+                http_response_code(503);
+                echo json_encode(
+                    array("code" => 503, "message" => "Sever error. Try again.")
+                );           
+            }
         } else {
-            http_response_code(503);
-            echo json_encode(
-                array("code" => 503, "message" => "Sever error. Try again.")
-            );           
+            http_response_code(400);        
+            echo json_encode(array("code" => 400, "message" => "Unable to update job. Data is incomplete."));
         }
-        break;
+
+    break;
 }

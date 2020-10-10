@@ -71,7 +71,8 @@ switch($req_method) {
                 array("code" => 404, "message" => "No bios found.")
             );
         }
-        break;
+        
+    break;
 
         
         
@@ -108,7 +109,8 @@ switch($req_method) {
             http_response_code(400);        
             echo json_encode(array("code" => 400, "message" => "Unable to create bio. Data is incomplete."));
         }
-        break;
+        
+    break;
     
     
     
@@ -132,7 +134,8 @@ switch($req_method) {
                 );
             }
         }
-        break;
+        
+    break;
     
 
 
@@ -147,7 +150,7 @@ switch($req_method) {
             !empty($data->heading) &&
             !empty($data->bio) &&
             !empty($data->img_src)
-            ){
+        ){
                 // set bio property values
                 $bio->id = $data->id;
                 $bio->heading = $data->heading;
@@ -168,9 +171,10 @@ switch($req_method) {
                         array("code" => 503, "message" => "Sever error. Try again.")
                     );           
                 }
-            } else {
-                http_response_code(400);        
-                echo json_encode(array("code" => 400, "message" => "Unable to update bio. Data is incomplete."));
-            }
-        break;
+        } else {
+            http_response_code(400);        
+            echo json_encode(array("code" => 400, "message" => "Unable to update bio. Data is incomplete."));
+        }
+        
+    break;
 }
