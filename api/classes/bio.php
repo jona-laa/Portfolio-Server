@@ -8,6 +8,7 @@ class Bio {
     public $heading;
     public $bio;
     public $img_src;
+    public $published;
   
     public function __construct($db){
         $this->conn = $db;
@@ -17,7 +18,7 @@ class Bio {
 
     // Get All Bio
     function read(){
-        $query = "SELECT id, heading, bio, img_src FROM $this->table_name";
+        $query = "SELECT id, heading, bio, img_src, published FROM $this->table_name";
         $result = $this->conn->prepare($query);
         $result->execute();
         return $result;
@@ -25,10 +26,10 @@ class Bio {
 
 
 
-    // Get One Course
+    // Get One Bio
     function readOne($id){
         var_dump($id);
-        $query = "SELECT id, heading, bio, img_src FROM $this->table_name WHERE id=$id";        
+        $query = "SELECT id, heading, bio, img_src, published FROM $this->table_name WHERE id=$id";        
         $result = $this->conn->prepare($query);
         $result->execute();
         return $result;
@@ -38,7 +39,7 @@ class Bio {
 
     // Get Post for Publishing (If there's more than one readOne is not realiable)
     function readPublished($published){
-        $query = "SELECT id, heading, bio, img_src FROM $this->table_name WHERE published=$published";        
+        $query = "SELECT id, heading, bio, img_src, published FROM $this->table_name WHERE published=$published";        
         $result = $this->conn->prepare($query);
         $result->execute();
         return $result;
@@ -46,25 +47,27 @@ class Bio {
 
 
 
-    // Create New Course
+    // Create New Bio
     function create() {
        $query = "INSERT INTO 
        $this->table_name
             SET
-                heading=:heading, bio=:bio, img_src=:img_src";
+                heading=:heading, bio=:bio, img_src=:img_src, published=:published";
   
-        // Prep that Query yo
+        // Prep that Query statement
         $statement = $this->conn->prepare($query);
     
-        // Better Sanitize them Datas
+        // Sanitize data
         $this->heading=htmlspecialchars(strip_tags($this->heading));
         $this->bio=htmlspecialchars(strip_tags($this->bio));
         $this->img_src=htmlspecialchars(strip_tags($this->img_src));
+        $this->published=htmlspecialchars(strip_tags($this->published));
     
-        // Bind those values my dude
+        // Bind values
         $statement->bindParam(":heading", $this->heading);
         $statement->bindParam(":bio", $this->bio);
         $statement->bindParam(":img_src", $this->img_src);
+        $statement->bindParam(":published", $this->published);
     
         if($statement->execute()){
             return true;
@@ -75,7 +78,7 @@ class Bio {
 
 
 
-    // Delete a Course
+    // Delete a Bio
     function delete($id) {
         $query = "DELETE FROM $this->table_name WHERE id=$id";
         $result = $this->conn->prepare($query);
@@ -85,30 +88,33 @@ class Bio {
 
 
     
-    // Update Course
+    // Update Bio
     function update() {
         $query = "UPDATE 
             $this->table_name
                 SET
                     heading = :heading,
                     bio = :bio,
-                    img_src=:img_src
+                    img_src=:img_src,
+                    published=:published
                 WHERE
                     id = :id";
     
         $statement = $this->conn->prepare($query);
     
-        // Sanitize Them Stings, Son 
+        // Sanitize Strings
         $this->id=htmlspecialchars(strip_tags($this->id));
         $this->heading=htmlspecialchars(strip_tags($this->heading));
         $this->bio=htmlspecialchars(strip_tags($this->bio));
         $this->img_src=htmlspecialchars(strip_tags($this->img_src));
+        $this->published=htmlspecialchars(strip_tags($this->published));
 
         // Bind Values
         $statement->bindParam(':id', $this->id);
         $statement->bindParam(':heading', $this->heading);
         $statement->bindParam(':bio', $this->bio);
         $statement->bindParam(":img_src", $this->img_src);
+        $statement->bindParam(":published", $this->published);
     
         if($statement->execute()){
             return true;

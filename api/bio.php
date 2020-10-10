@@ -15,11 +15,6 @@ $req_method = $_SERVER['REQUEST_METHOD'];
 if(isset($_GET['id'])) {
     $id = $_GET['id'];
 }
-// Get post to output on page
-if(isset($GET['published'])) {
-    $published = $_GET['published'];
-}
-
 
 // Instantiate DB and bio
 $database = new Database();
@@ -35,6 +30,7 @@ switch($req_method) {
     
     // GET
     case 'GET':
+        
         // Get all or One bio?
         if (!empty($id)) {
             $result = $bio->readOne($id);
@@ -59,7 +55,8 @@ switch($req_method) {
                     "id" => $id,
                     "heading" => $heading,
                     "bio" => $bio,
-                    "img_src" => $img_src
+                    "img_src" => $img_src,
+                    "published" => $published
                 );
           
                 array_push($bios_arr["bios"], $bio_item);
@@ -80,18 +77,21 @@ switch($req_method) {
         
     // POST
     case 'POST':
+        // Input Data
         $data = json_decode(file_get_contents("php://input"));
 
         // Deny req if empty input
         if(
             !empty($data->heading) &&
             !empty($data->bio) &&
-            !empty($data->img_src)
-        ){
+            !empty($data->img_src) &&
+            isset($data->published)
+            ){
             // set bio property values
             $bio->heading = $data->heading;
             $bio->bio = $data->bio;
             $bio->img_src = $data->img_src;
+            $bio->published = $data->published;
     
             if($bio->create()) {
                 http_response_code(201);
@@ -138,26 +138,39 @@ switch($req_method) {
 
     // PUT
     case 'PUT':
+        // Input Data
         $data = json_decode(file_get_contents("php://input"));
 
-        // set ID property of bio to be edited
-        $bio->id = $data->id;
-        
-        // set bio property values
-        $bio->heading = $data->heading;
-        $bio->bio = $data->bio;
-        $bio->img_src = $data->img_src;
+        // Deny req if empty input
+        if(
+            !empty($data->id) &&
+            !empty($data->heading) &&
+            !empty($data->bio) &&
+            !empty($data->img_src)
+            ){
+                // set bio property values
+                $bio->id = $data->id;
+                $bio->heading = $data->heading;
+                $bio->bio = $data->bio;
+                $bio->img_src = $data->img_src;
+                if(!empty($data->published)) {
+                    $bio->published = $data->published;
+                }
 
-        if($bio->update()) {
-            http_response_code(200);
-            echo json_encode(
-                array("code" => 200, "message" => "bio updated")
-            );
-        } else {
-            http_response_code(503);
-            echo json_encode(
-                array("code" => 503, "message" => "Sever error. Try again.")
-            );           
-        }
+                if($bio->update()) {
+                    http_response_code(200);
+                    echo json_encode(
+                        array("code" => 200, "message" => "bio updated")
+                    );
+                } else {
+                    http_response_code(503);
+                    echo json_encode(
+                        array("code" => 503, "message" => "Sever error. Try again.")
+                    );           
+                }
+            } else {
+                http_response_code(400);        
+                echo json_encode(array("code" => 400, "message" => "Unable to update bio. Data is incomplete."));
+            }
         break;
 }
