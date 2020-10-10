@@ -132,23 +132,31 @@ switch($req_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
 
-        // set ID property of skill to be edited
-        $skill->id = $data->id;
-        
-        // set skill property values
-        $skill->skill = $data->skill;
-        $skill->icon = $data->icon;
+        // Deny req if empty input
+        if(
+            !empty($data->id) &&
+            !empty($data->skill) &&
+            !empty($data->icon)
+        ){
+            // set skill property values
+            $skill->id = $data->id;
+            $skill->skill = $data->skill;
+            $skill->icon = $data->icon;
 
-        if($skill->update()) {
-            http_response_code(200);
-            echo json_encode(
-                array("code" => 200, "message" => "skill updated")
-            );
-        } else {
-            http_response_code(503);
-            echo json_encode(
-                array("code" => 503, "message" => "Sever error. Try again.")
-            );           
+            if($skill->update()) {
+                http_response_code(200);
+                echo json_encode(
+                    array("code" => 200, "message" => "skill updated")
+                );
+            } else {
+                http_response_code(503);
+                echo json_encode(
+                    array("code" => 503, "message" => "Sever error. Try again.")
+                );           
+            }
+        } else{
+            http_response_code(400);        
+            echo json_encode(array("code" => 400, "message" => "Unable to update skill. Data is incomplete."));
         }
-        break;
+    break;
 }
