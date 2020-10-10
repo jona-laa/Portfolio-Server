@@ -70,7 +70,8 @@ switch($req_method) {
                 array("code" => 404, "message" => "No projects found.")
             );
         }
-        break;
+        
+    break;
 
         
         
@@ -106,7 +107,8 @@ switch($req_method) {
             http_response_code(400);        
             echo json_encode(array("code" => 400, "message" => "Unable to create project. Data is incomplete."));
         }
-        break;
+        
+    break;
     
     
     
@@ -130,7 +132,8 @@ switch($req_method) {
                 );
             }
         }
-        break;
+        
+    break;
     
 
 
@@ -138,25 +141,35 @@ switch($req_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
 
-        // set ID property of project to be edited
-        $project->id = $data->id;
-        
-        // set project property values
-        $project->title = $data->title;
-        $project->prj_url = $data->prj_url;
-        $project->descr = $data->descr;
-        $project->img_src = $data->img_src;
+        // Deny req if empty input
+        if(
+            !empty($data->title) &&
+            !empty($data->prj_url) &&
+            !empty($data->descr) &&
+            !empty($data->img_src)
+        ){
+            // set project property values
+            $project->id = $data->id;
+            $project->title = $data->title;
+            $project->prj_url = $data->prj_url;
+            $project->descr = $data->descr;
+            $project->img_src = $data->img_src;
 
-        if($project->update()) {
-            http_response_code(200);
-            echo json_encode(
-                array("code" => 200, "message" => "project updated")
-            );
-        } else {
-            http_response_code(503);
-            echo json_encode(
-                array("code" => 503, "message" => "Sever error. Try again.")
-            );           
+            if($project->update()) {
+                http_response_code(200);
+                echo json_encode(
+                    array("code" => 200, "message" => "project updated")
+                );
+            } else {
+                http_response_code(503);
+                echo json_encode(
+                    array("code" => 503, "message" => "Sever error. Try again.")
+                );           
+            }
+        } else{
+            http_response_code(400);        
+            echo json_encode(array("code" => 400, "message" => "Unable to update project. Data is incomplete."));
         }
-        break;
+        
+    break;
 }
