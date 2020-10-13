@@ -1,7 +1,7 @@
 <?php
 class Course {
     private $conn;
-    private $table_name = "courses";
+    private $table_name = COURSES;
   
     // Course Properties
     public $id;

@@ -1,7 +1,7 @@
 <?php
 class Project {
     private $conn;
-    private $table_name = "projects";
+    private $table_name = PROJECTS;
   
     // Job Properties
     public $id;

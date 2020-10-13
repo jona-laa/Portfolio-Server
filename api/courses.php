@@ -2,7 +2,9 @@
 include_once './db/database.php';
 include_once './classes/course.php';
 
-header("Access-Control-Allow-Origin: *");
+$http_origin = ORIGIN;
+
+header("Access-Control-Allow-Origin: $http_origin");
 header("Content-Type: application/json; charset=UTF-8");
 header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE');
 header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
@@ -68,7 +70,7 @@ switch($req_method) {
         } else {
             http_response_code(404);
             echo json_encode(
-                array("code" => 404, "message" => "No courses found.")
+                array("code" => 404, "message" => "No Courses Found.")
             );
         }
 
@@ -105,17 +107,17 @@ switch($req_method) {
                 } else {
                     http_response_code(503);
                     echo json_encode(
-                        array("code" => 503, "message" => "Something went wrong. Try again.")
+                        array("code" => 503, "message" => "Something Went Wrong. Try Again.")
                     );
                 }
             } else {
                 http_response_code(400);        
-                echo json_encode(array("code" => 400, "message" => "Unable to create course. Data is incomplete."));
+                echo json_encode(array("code" => 400, "message" => "Unable to Create Course. Data is Incomplete."));
             }
             // No token - No data for you, mkay?
          } else {
             http_response_code(401);        
-            echo json_encode(array("code" => 401, "message" => "Unauthorized request."));
+            echo json_encode(array("code" => 401, "message" => "Unauthorized Request."));
         }
 
     break;
@@ -143,17 +145,17 @@ switch($req_method) {
                 } else {
                     http_response_code(503);
                     echo json_encode(
-                        array("code" => 503, "message" => "Sever error. Try again.")
+                        array("code" => 503, "message" => "Something Went Wrong. Try Again.")
                     );           
                 }
             } else {
                 http_response_code(400);        
-                echo json_encode(array("code" => 400, "message" => "Unable to delete course. Data is incomplete."));
+                echo json_encode(array("code" => 400, "message" => "Unable to Delete Course. Data is Incomplete."));
             }
             // No token - No data for you, mkay?
         } else {
             http_response_code(401);        
-            echo json_encode(array("code" => 401, "message" => "Unauthorized request."));
+            echo json_encode(array("code" => 401, "message" => "Unauthorized Request."));
         }
 
     break;
@@ -181,6 +183,7 @@ switch($req_method) {
                 $course->institution = $data->institution;
                 $course->date_start = $data->date_start;
                 $course->date_end = $data->date_end;
+                $course->date_end = $data->date_end;
                 $course->descr = $data->descr;
 
                 if($course->update()) {
@@ -191,17 +194,17 @@ switch($req_method) {
                 } else {
                     http_response_code(503);
                     echo json_encode(
-                        array("code" => 503, "message" => "Sever error. Try again.")
+                        array("code" => 503, "message" => "Something Went Wrong. Try Again.")
                     );           
                 }
             } else {
                 http_response_code(400);        
-                echo json_encode(array("code" => 400, "message" => "Unable to update course. Data is incomplete."));
+                echo json_encode(array("code" => 400, "message" => "Unable to Update Course. Data is Incomplete."));
             }
             // No token - No data for you, mkay?
         } else {
             http_response_code(401);        
-            echo json_encode(array("code" => 401, "message" => "Unauthorized request."));
+            echo json_encode(array("code" => 401, "message" => "Unauthorized Request."));
         }
 
     break;

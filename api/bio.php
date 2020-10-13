@@ -2,7 +2,9 @@
 include_once './db/database.php';
 include_once './classes/bio.php';
 
-header("Access-Control-Allow-Origin: *");
+$http_origin = ORIGIN;
+
+header("Access-Control-Allow-Origin: $http_origin");
 header("Content-Type: application/json; charset=UTF-8");
 header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE');
 header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
@@ -68,7 +70,7 @@ switch($req_method) {
         } else {
             http_response_code(404);
             echo json_encode(
-                array("code" => 404, "message" => "No bios found.")
+                array("code" => 404, "message" => "No Posts Found.")
             );
         }
         
@@ -81,34 +83,41 @@ switch($req_method) {
         // Input Data
         $data = json_decode(file_get_contents("php://input"));
 
-        // Deny req if empty input
-        if(
-            !empty($data->heading) &&
-            !empty($data->bio) &&
-            !empty($data->img_src)
-            ){
-            // set bio property values
-            $bio->heading = $data->heading;
-            $bio->bio = $data->bio;
-            $bio->img_src = $data->img_src;
-            if(!empty($data->published)) {
-                $bio->published = $data->published;
-            }
-    
-            if($bio->create()) {
-                http_response_code(201);
+        // Only available with access token
+        if(!empty($data->token) && $data->token == TOKEN) {
+            // Deny req if empty input
+            if(
+                !empty($data->heading) &&
+                !empty($data->bio) &&
+                !empty($data->img_src)
+                ){
+                // set bio property values
+                $bio->heading = $data->heading;
+                $bio->bio = $data->bio;
+                $bio->img_src = $data->img_src;
+                if(isset($data->published)) {
+                    $bio->published = $data->published;
+                }
+        
+                if($bio->create()) {
+                    http_response_code(201);
+                        echo json_encode(
+                        array("code" => 201, "message" => "New bio created")
+                    );
+                } else {
+                    http_response_code(503);
                     echo json_encode(
-                    array("code" => 201, "message" => "New bio created")
-                );
-            } else {
-                http_response_code(503);
-                echo json_encode(
-                    array("code" => 503, "message" => "Something went wrong. Try again.")
-                );
+                        array("code" => 503, "message" => "Something Went Wrong. Try Again.")
+                    );
+                }
+            } else{
+                http_response_code(400);        
+                echo json_encode(array("code" => 400, "message" => "Unable to Create Post. Data is Incomplete."));
             }
-        } else{
-            http_response_code(400);        
-            echo json_encode(array("code" => 400, "message" => "Unable to create bio. Data is incomplete."));
+        // No token - No data for you, mkay?
+        } else {
+            http_response_code(401);        
+            echo json_encode(array("code" => 401, "message" => "Unauthorized Request."));
         }
         
     break;
@@ -117,25 +126,38 @@ switch($req_method) {
     
     // DELETE
     case 'DELETE':
-        if(!isset($id)) {
-            http_response_code(510);
-            echo json_encode(
-                array("code" => 510, "message" => "No id was sent")
-            );
-        } else {
-            if($bio->delete($id)) {
-                http_response_code(200);
-                echo json_encode(
-                    array("code" => 200, "message" => "bio deleted")
-                );
+       $data = json_decode(file_get_contents("php://input"));
+
+        // Only available with access token
+         if(!empty($data->token) && $data->token == TOKEN) {
+            // Deny req if empty input
+            if(
+                !empty($data->id)
+            ){
+                // set course property values
+                $bio->id = $data->id;
+
+                if($bio->delete()) {
+                    http_response_code(200);
+                    echo json_encode(
+                        array("code" => 200, "message" => "Post Deleted")
+                    );
+                } else {
+                    http_response_code(503);
+                    echo json_encode(
+                        array("code" => 503, "message" => "Something Went Wrong. Try Again.")
+                    );           
+                }
             } else {
-                http_response_code(503);
-                echo json_encode(
-                    array("code" => 503, "message" => "Sever error. Try again.")
-                );
+                http_response_code(400);        
+                echo json_encode(array("code" => 400, "message" => "Unable to Delete Course. Data is Incomplete."));
             }
+            // No token - No data for you, mkay?
+        } else {
+            http_response_code(401);        
+            echo json_encode(array("code" => 401, "message" => "Unauthorized Request."));
         }
-        
+
     break;
     
 
@@ -145,36 +167,43 @@ switch($req_method) {
         // Input Data
         $data = json_decode(file_get_contents("php://input"));
 
-        // Deny req if empty input
-        if(
-            !empty($data->id) &&
-            !empty($data->heading) &&
-            !empty($data->bio) &&
-            !empty($data->img_src)
-        ){
-                // set bio property values
-                $bio->id = $data->id;
-                $bio->heading = $data->heading;
-                $bio->bio = $data->bio;
-                $bio->img_src = $data->img_src;
-                if(!empty($data->published)) {
-                    $bio->published = $data->published;
-                }
+        // Only available with access token
+        if(!empty($data->token) && $data->token == TOKEN) {
+            // Deny req if empty input
+            if(
+                !empty($data->id) &&
+                !empty($data->heading) &&
+                !empty($data->bio) &&
+                !empty($data->img_src)
+            ){
+                    // set bio property values
+                    $bio->id = $data->id;
+                    $bio->heading = $data->heading;
+                    $bio->bio = $data->bio;
+                    $bio->img_src = $data->img_src;
+                    if(isset($data->published)) {
+                        $bio->published = $data->published;
+                    }
 
-                if($bio->update()) {
-                    http_response_code(200);
-                    echo json_encode(
-                        array("code" => 200, "message" => "bio updated")
-                    );
-                } else {
-                    http_response_code(503);
-                    echo json_encode(
-                        array("code" => 503, "message" => "Sever error. Try again.")
-                    );           
-                }
+                    if($bio->update()) {
+                        http_response_code(200);
+                        echo json_encode(
+                            array("code" => 200, "message" => "Post Updated")
+                        );
+                    } else {
+                        http_response_code(503);
+                        echo json_encode(
+                            array("code" => 503, "message" => "Something Went Wrong. Try Again.")
+                        );           
+                    }
+            } else {
+                http_response_code(400);        
+                echo json_encode(array("code" => 400, "message" => "Unable to Update Post. Data is Incomplete."));
+            }
+        // No token - No data for you, mkay?
         } else {
-            http_response_code(400);        
-            echo json_encode(array("code" => 400, "message" => "Unable to update bio. Data is incomplete."));
+            http_response_code(401);        
+            echo json_encode(array("code" => 401, "message" => "Unauthorized Request."));
         }
         
     break;
