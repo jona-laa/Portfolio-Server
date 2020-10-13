@@ -1,7 +1,7 @@
 <?php
 class Course {
     private $conn;
-    private $table_name = "courses";
+    private $table_name = COURSES;
   
     // Course Properties
     public $id;
@@ -71,11 +71,20 @@ class Course {
 
 
     // Delete a Course
-    function delete($id) {
-        $query = "DELETE FROM $this->table_name WHERE id=$id";
-        $result = $this->conn->prepare($query);
-        $result->execute();    
-        return $result;
+    function delete() {
+        $query = "DELETE FROM $this->table_name WHERE id=:id";
+
+        $statement = $this->conn->prepare($query);
+
+        $this->id=htmlspecialchars(strip_tags($this->id));
+
+        $statement->bindParam(':id', $this->id);
+
+        if($statement->execute()){
+            return true;
+        }
+    
+        return false;
     }
 
 

@@ -1,7 +1,7 @@
 <?php
 class Bio {
     private $conn;
-    private $table_name = "bio";
+    private $table_name = ABOUT;
   
     // Bio Properties
     public $id;
@@ -28,7 +28,6 @@ class Bio {
 
     // Get One Bio
     function readOne($id){
-        var_dump($id);
         $query = "SELECT id, heading, bio, img_src, published FROM $this->table_name WHERE id=$id";        
         $result = $this->conn->prepare($query);
         $result->execute();
@@ -79,11 +78,20 @@ class Bio {
 
 
     // Delete a Bio
-    function delete($id) {
-        $query = "DELETE FROM $this->table_name WHERE id=$id";
-        $result = $this->conn->prepare($query);
-        $result->execute();    
-        return $result;
+    function delete() {
+        $query = "DELETE FROM $this->table_name WHERE id=:id";
+
+        $statement = $this->conn->prepare($query);
+
+        $this->id=htmlspecialchars(strip_tags($this->id));
+
+        $statement->bindParam(':id', $this->id);
+
+        if($statement->execute()){
+            return true;
+        }
+    
+        return false;
     }
 
 

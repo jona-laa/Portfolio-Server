@@ -2,7 +2,9 @@
 include_once './db/database.php';
 include_once './classes/job.php';
 
-header("Access-Control-Allow-Origin: *");
+$http_origin = ORIGIN;
+
+header("Access-Control-Allow-Origin: $http_origin");
 header("Content-Type: application/json; charset=UTF-8");
 header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE');
 header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
@@ -68,7 +70,7 @@ switch($req_method) {
         } else {
             http_response_code(404);
             echo json_encode(
-                array("code" => 404, "message" => "No jobs found.")
+                array("code" => 404, "message" => "No Jobs Found.")
             );
         }
         
@@ -80,62 +82,82 @@ switch($req_method) {
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
 
-        // Deny req if empty input
-        if(
-            !empty($data->company) &&
-            !empty($data->title) &&
-            !empty($data->date_start) &&
-            !empty($data->date_end) &&
-            !empty($data->descr) 
-        ){
-            // set job property values
-            $job->company = $data->company;
-            $job->title = $data->title;
-            $job->date_start = $data->date_start;
-            $job->date_end = $data->date_end;
-            $job->descr = $data->descr;
-    
-            if($job->create()) {
-                http_response_code(201);
+        // Only available with access token
+        if(!empty($data->token) && $data->token == TOKEN) {
+            // Deny req if empty input
+            if(
+                !empty($data->company) &&
+                !empty($data->title) &&
+                !empty($data->date_start) &&
+                !empty($data->date_end) &&
+                !empty($data->descr) 
+            ){
+                // set job property values
+                $job->company = $data->company;
+                $job->title = $data->title;
+                $job->date_start = $data->date_start;
+                $job->date_end = $data->date_end;
+                $job->descr = $data->descr;
+        
+                if($job->create()) {
+                    http_response_code(201);
+                        echo json_encode(
+                        array("code" => 201, "message" => "New Job Created")
+                    );
+                } else {
+                    http_response_code(503);
                     echo json_encode(
-                    array("code" => 201, "message" => "New job created")
-                );
+                        array("code" => 503, "message" => "Something Went Wrong. Try Again.")
+                    );
+                }
             } else {
-                http_response_code(503);
-                echo json_encode(
-                    array("code" => 503, "message" => "Something went wrong. Try again.")
-                );
+                http_response_code(400);        
+                echo json_encode(array("code" => 400, "message" => "Unable to Create Job. Data is Incomplete."));
             }
+        // No token - No data for you, mkay?
         } else {
-            http_response_code(400);        
-            echo json_encode(array("code" => 400, "message" => "Unable to create job. Data is incomplete."));
+            http_response_code(401);        
+            echo json_encode(array("code" => 401, "message" => "Unauthorized Request."));
         }
         
     break;
     
     
     
-    // DELETE
+ // DELETE
     case 'DELETE':
-        if(!isset($id)) {
-            http_response_code(510);
-            echo json_encode(
-                array("code" => 510, "message" => "No id was sent")
-            );
-        } else {
-            if($job->delete($id)) {
-                http_response_code(200);
-                echo json_encode(
-                    array("code" => 200, "message" => "job deleted")
-                );
+       $data = json_decode(file_get_contents("php://input"));
+
+        // Only available with access token
+         if(!empty($data->token) && $data->token == TOKEN) {
+            // Deny req if empty input
+            if(
+                !empty($data->id)
+            ){
+                // set course property values
+                $job->id = $data->id;
+
+                if($job->delete()) {
+                    http_response_code(200);
+                    echo json_encode(
+                        array("code" => 200, "message" => "Job Deleted")
+                    );
+                } else {
+                    http_response_code(503);
+                    echo json_encode(
+                        array("code" => 503, "message" => "Something Went Wrong. Try Again.")
+                    );           
+                }
             } else {
-                http_response_code(503);
-                echo json_encode(
-                    array("code" => 503, "message" => "Sever error. Try again.")
-                );
+                http_response_code(400);        
+                echo json_encode(array("code" => 400, "message" => "Unable to Delete Job. Data is Incomplete."));
             }
+            // No token - No data for you, mkay?
+        } else {
+            http_response_code(401);        
+            echo json_encode(array("code" => 401, "message" => "Unauthorized Request."));
         }
-        
+
     break;
     
 
@@ -144,37 +166,44 @@ switch($req_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
 
-        // Deny req if empty input
-        if(
-            !empty($data->id) &&
-            !empty($data->company) &&
-            !empty($data->title) &&
-            !empty($data->date_start) &&
-            !empty($data->date_end) &&
-            !empty($data->descr) 
-        ){        
-            // set job property values
-            $job->id = $data->id;
-            $job->company = $data->company;
-            $job->title = $data->title;
-            $job->date_start = $data->date_start;
-            $job->date_end = $data->date_end;
-            $job->descr = $data->descr;
+        // Only available with access token
+        if(!empty($data->token) && $data->token == TOKEN) {
+            // Deny req if empty input
+            if(
+                !empty($data->id) &&
+                !empty($data->company) &&
+                !empty($data->title) &&
+                !empty($data->date_start) &&
+                !empty($data->date_end) &&
+                !empty($data->descr) 
+            ){        
+                // set job property values
+                $job->id = $data->id;
+                $job->company = $data->company;
+                $job->title = $data->title;
+                $job->date_start = $data->date_start;
+                $job->date_end = $data->date_end;
+                $job->descr = $data->descr;
 
-            if($job->update()) {
-                http_response_code(200);
-                echo json_encode(
-                    array("code" => 200, "message" => "job updated")
-                );
+                if($job->update()) {
+                    http_response_code(200);
+                    echo json_encode(
+                        array("code" => 200, "message" => "Job Updated")
+                    );
+                } else {
+                    http_response_code(503);
+                    echo json_encode(
+                        array("code" => 503, "message" => "Something Went Wrong. Try Again.")
+                    );           
+                }
             } else {
-                http_response_code(503);
-                echo json_encode(
-                    array("code" => 503, "message" => "Sever error. Try again.")
-                );           
+                http_response_code(400);        
+                echo json_encode(array("code" => 400, "message" => "Unable to Update Job. Data is Incomplete."));
             }
+        // No token - No data for you, mkay?
         } else {
-            http_response_code(400);        
-            echo json_encode(array("code" => 400, "message" => "Unable to update job. Data is incomplete."));
+            http_response_code(401);        
+            echo json_encode(array("code" => 401, "message" => "Unauthorized Request."));
         }
 
     break;

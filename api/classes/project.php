@@ -1,7 +1,7 @@
 <?php
 class Project {
     private $conn;
-    private $table_name = "projects";
+    private $table_name = PROJECTS;
   
     // Job Properties
     public $id;
@@ -68,11 +68,20 @@ class Project {
 
 
     // Delete Job
-    function delete($id) {
-        $query = "DELETE FROM $this->table_name WHERE id=$id";
-        $result = $this->conn->prepare($query);
-        $result->execute();    
-        return $result;
+    function delete() {
+        $query = "DELETE FROM $this->table_name WHERE id=:id";
+
+        $statement = $this->conn->prepare($query);
+
+        $this->id=htmlspecialchars(strip_tags($this->id));
+
+        $statement->bindParam(':id', $this->id);
+
+        if($statement->execute()){
+            return true;
+        }
+    
+        return false;
     }
 
 
