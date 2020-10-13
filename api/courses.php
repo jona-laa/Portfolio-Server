@@ -80,35 +80,42 @@ switch($req_method) {
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
 
-        // Deny req if empty input
-        if(
-            !empty($data->title) &&
-            !empty($data->institution) &&
-            !empty($data->date_start) &&
-            !empty($data->date_end) &&
-            !empty($data->descr) 
-        ){
-            // set course property values
-            $course->title = $data->title;
-            $course->institution = $data->institution;
-            $course->date_start = $data->date_start;
-            $course->date_end = $data->date_end;
-            $course->descr = $data->descr;
-    
-            if($course->create()) {
-                http_response_code(201);
+        // Only available with access token
+        if(!empty($data->token) && $data->token == TOKEN) {
+            // Deny req if empty input
+            if(
+                !empty($data->title) &&
+                !empty($data->institution) &&
+                !empty($data->date_start) &&
+                !empty($data->date_end) &&
+                !empty($data->descr) 
+            ){
+                // set course property values
+                $course->title = $data->title;
+                $course->institution = $data->institution;
+                $course->date_start = $data->date_start;
+                $course->date_end = $data->date_end;
+                $course->descr = $data->descr;
+        
+                if($course->create()) {
+                    http_response_code(201);
+                        echo json_encode(
+                        array("code" => 201, "message" => "New course created")
+                    );
+                } else {
+                    http_response_code(503);
                     echo json_encode(
-                    array("code" => 201, "message" => "New course created")
-                );
+                        array("code" => 503, "message" => "Something went wrong. Try again.")
+                    );
+                }
             } else {
-                http_response_code(503);
-                echo json_encode(
-                    array("code" => 503, "message" => "Something went wrong. Try again.")
-                );
+                http_response_code(400);        
+                echo json_encode(array("code" => 400, "message" => "Unable to create course. Data is incomplete."));
             }
-        } else {
-            http_response_code(400);        
-            echo json_encode(array("code" => 400, "message" => "Unable to create course. Data is incomplete."));
+            // No token - No data for you, mkay?
+         } else {
+            http_response_code(401);        
+            echo json_encode(array("code" => 401, "message" => "Unauthorized request."));
         }
 
     break;
@@ -117,23 +124,36 @@ switch($req_method) {
     
     // DELETE
     case 'DELETE':
-        if(!isset($id)) {
-            http_response_code(510);
-            echo json_encode(
-                array("code" => 510, "message" => "No id was sent")
-            );
-        } else {
-            if($course->delete($id)) {
-                http_response_code(200);
-                echo json_encode(
-                    array("code" => 200, "message" => "Course deleted")
-                );
+       $data = json_decode(file_get_contents("php://input"));
+
+        // Only available with access token
+         if(!empty($data->token) && $data->token == TOKEN) {
+            // Deny req if empty input
+            if(
+                !empty($data->id)
+            ){
+                // set course property values
+                $course->id = $data->id;
+
+                if($course->delete()) {
+                    http_response_code(200);
+                    echo json_encode(
+                        array("code" => 200, "message" => "Course Deleted")
+                    );
+                } else {
+                    http_response_code(503);
+                    echo json_encode(
+                        array("code" => 503, "message" => "Sever error. Try again.")
+                    );           
+                }
             } else {
-                http_response_code(503);
-                echo json_encode(
-                    array("code" => 503, "message" => "Sever error. Try again.")
-                );
+                http_response_code(400);        
+                echo json_encode(array("code" => 400, "message" => "Unable to delete course. Data is incomplete."));
             }
+            // No token - No data for you, mkay?
+        } else {
+            http_response_code(401);        
+            echo json_encode(array("code" => 401, "message" => "Unauthorized request."));
         }
 
     break;
@@ -144,37 +164,44 @@ switch($req_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
 
-        // Deny req if empty input
-        if(
-            !empty($data->id) &&
-            !empty($data->title) &&
-            !empty($data->institution) &&
-            !empty($data->date_start) &&
-            !empty($data->date_end) &&
-            !empty($data->descr) 
-        ){
-            // set course property values
-            $course->id = $data->id;
-            $course->title = $data->title;
-            $course->institution = $data->institution;
-            $course->date_start = $data->date_start;
-            $course->date_end = $data->date_end;
-            $course->descr = $data->descr;
+        // Only available with access token
+         if(!empty($data->token) && $data->token == TOKEN) {
+            // Deny req if empty input
+            if(
+                !empty($data->id) &&
+                !empty($data->title) &&
+                !empty($data->institution) &&
+                !empty($data->date_start) &&
+                !empty($data->date_end) &&
+                !empty($data->descr) 
+            ){
+                // set course property values
+                $course->id = $data->id;
+                $course->title = $data->title;
+                $course->institution = $data->institution;
+                $course->date_start = $data->date_start;
+                $course->date_end = $data->date_end;
+                $course->descr = $data->descr;
 
-            if($course->update()) {
-                http_response_code(200);
-                echo json_encode(
-                    array("code" => 200, "message" => "Course updated")
-                );
+                if($course->update()) {
+                    http_response_code(200);
+                    echo json_encode(
+                        array("code" => 200, "message" => "Course updated")
+                    );
+                } else {
+                    http_response_code(503);
+                    echo json_encode(
+                        array("code" => 503, "message" => "Sever error. Try again.")
+                    );           
+                }
             } else {
-                http_response_code(503);
-                echo json_encode(
-                    array("code" => 503, "message" => "Sever error. Try again.")
-                );           
+                http_response_code(400);        
+                echo json_encode(array("code" => 400, "message" => "Unable to update course. Data is incomplete."));
             }
+            // No token - No data for you, mkay?
         } else {
-            http_response_code(400);        
-            echo json_encode(array("code" => 400, "message" => "Unable to update course. Data is incomplete."));
+            http_response_code(401);        
+            echo json_encode(array("code" => 401, "message" => "Unauthorized request."));
         }
 
     break;

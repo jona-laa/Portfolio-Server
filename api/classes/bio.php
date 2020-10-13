@@ -28,7 +28,6 @@ class Bio {
 
     // Get One Bio
     function readOne($id){
-        var_dump($id);
         $query = "SELECT id, heading, bio, img_src, published FROM $this->table_name WHERE id=$id";        
         $result = $this->conn->prepare($query);
         $result->execute();
