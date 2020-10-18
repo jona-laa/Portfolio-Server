@@ -21,3 +21,10 @@ Serves data about projects, jobs, studies, skillset, and a small abuout section.
 * Implemented. Requires access token
 #### Delete
 * Implemented. Requires access token
+
+
+## Usage
+* `git clone https://github.com/jona-laa/Portfolio-Server.git`
+* Move folder to an AMP-stack environment. 
+  * Usually available at http://localhost:8080/portfolio/api/{endpoint name} 
+* You will also have to create a database, and a config.php file with credentials etc.
